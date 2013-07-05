@@ -3,7 +3,7 @@ import numpy as np
 def import_mlab(filename):
 	from scipy.io import loadmat
 	
-	data = loadmat(datafile, matlab_compatible=True)
+	data = loadmat(filename, matlab_compatible=True)
 
 	pdata=dict()
 	for key in data.keys():
@@ -34,4 +34,69 @@ def computeCentroids(X, idx, K):
 	given X (each row is an example), idx is a vector of indices representing which centroid each
 	row was assigned to, and K is the number of centroids
 	"""
-	
+	#is there a pythonic way to do this without looping over K?
+	new_centroids = np.zeros([K, X.shape[1]])
+
+	for i in xrange(0, K):
+		new_centroids[i, :] = np.mean(X[idx == i], 0)
+
+	return new_centroids	
+
+def runkMeans(X, initial_centroids, max_iters, plot_progress = False):
+	"""
+	RUNKMEANS runs the K-Means algorithm on data matrix X, where each row of X
+	is a single example
+	[centroids, idx] = RUNKMEANS(X, initial_centroids, max_iters, ...
+	plot_progress) runs the K-Means algorithm on data matrix X, where each 
+	row of X is a single example. It uses initial_centroids used as the
+	initial centroids. max_iters specifies the total number of interactions 
+	of K-Means to execute. plot_progress is a true/false flag that 
+	indicates if the function should also plot its progress as the 
+	learning happens. This is set to false by default. runkMeans returns 
+	centroids, a Kxn matrix of the computed centroids and idx, a m x 1 
+	vector of centroid assignments (i.e. each entry in range [1..K])
+	"""	
+	import matplotlib.pyplot as pyplot
+	import numpy as np
+	if plot_progress:
+		pyplot.figure()
+
+	(m, n) = X.shape
+	K = initial_centroids.shape[0]
+	centroids = initial_centroids
+	previous_centroids = centroids
+	idx = np.zeros([m, 1])
+
+	for i in xrange(1, max_iters+1):
+		print "K-means iteration {0}/{1}...".format(i, max_iters)
+
+		idx = findClosestCentroids(X, centroids)
+		
+		if plot_progress:
+			plotProgresskMeans(X, centroids, previous_centroids, idx, K, i)
+			previous_centroids = centroids
+
+		centroids = computeCentroids(X, idx, K)
+	return (centroids, idx)		
+
+def plotProgresskMeans(X, centroids, previous, idx, K, i):
+	"""
+	Helper function that displays progress of k-means over 2D data
+	Plots line between previous and current location of centroids
+	"""
+	import matplotlib.pyplot as pyplot
+	plotDataPoints(X, idx, K)
+
+	pyplot.plot(centroids[:,0], centroids[:,1], 'x', markeredgecolor='k', markersize=10, linewidth=20)
+	for j in xrange(0, centroids.shape[0]):
+		pyplot.plot(np.hstack([centroids[j,0], previous[j,0]]), np.hstack([centroids[j,1], previous[j,1]]))
+	pyplot.title("Iteration number {0}".format(i))
+	pyplot.draw()
+		
+def plotDataPoints(X, idx, K):
+	"""
+	Plots data points in X, coloring them so those w same index have same color
+	"""
+	import matplotlib.pyplot as pyplot
+	import matplotlib.cm as cm
+	pyplot.scatter(X[:,0], X[:,1], c=idx, cmap=cm.hsv)
