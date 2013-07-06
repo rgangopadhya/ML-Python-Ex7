@@ -58,6 +58,7 @@ def runkMeans(X, initial_centroids, max_iters, plot_progress = False):
 	"""	
 	import matplotlib.pyplot as pyplot
 	import numpy as np
+
 	if plot_progress:
 		pyplot.figure()
 
@@ -67,16 +68,20 @@ def runkMeans(X, initial_centroids, max_iters, plot_progress = False):
 	previous_centroids = centroids
 	idx = np.zeros([m, 1])
 
+	#loop through each iteration
 	for i in xrange(1, max_iters+1):
 		print "K-means iteration {0}/{1}...".format(i, max_iters)
 
+		#update index based on the closest centroid for each point
 		idx = findClosestCentroids(X, centroids)
 		
 		if plot_progress:
+			#plot points, coloring based on new indices, draw line betweeen previous centroid points and current centroid
 			plotProgresskMeans(X, centroids, previous_centroids, idx, K, i)
 			previous_centroids = centroids
 
 		centroids = computeCentroids(X, idx, K)
+
 	return (centroids, idx)		
 
 def plotProgresskMeans(X, centroids, previous, idx, K, i):
@@ -87,11 +92,13 @@ def plotProgresskMeans(X, centroids, previous, idx, K, i):
 	import matplotlib.pyplot as pyplot
 	plotDataPoints(X, idx, K)
 
-	pyplot.plot(centroids[:,0], centroids[:,1], 'x', markeredgecolor='k', markersize=10, linewidth=20)
+	pyplot.plot(centroids[:,0], centroids[:, 1], 'x', markeredgecolor='k', markersize=10, linewidth=20)
 	for j in xrange(0, centroids.shape[0]):
-		pyplot.plot(np.hstack([centroids[j,0], previous[j,0]]), np.hstack([centroids[j,1], previous[j,1]]))
+		pyplot.plot(np.hstack([centroids[j, 0], previous[j, 0]]), np.hstack([centroids[j, 1], previous[j, 1]]), c='k')
 	pyplot.title("Iteration number {0}".format(i))
-	pyplot.draw()
+	pyplot.draw()	
+	pyplot.show(block=False)
+
 		
 def plotDataPoints(X, idx, K):
 	"""
@@ -99,4 +106,12 @@ def plotDataPoints(X, idx, K):
 	"""
 	import matplotlib.pyplot as pyplot
 	import matplotlib.cm as cm
-	pyplot.scatter(X[:,0], X[:,1], c=idx, cmap=cm.hsv)
+	pyplot.scatter(X[:,0], X[:,1], c=idx, cmap=cm.get_cmap("Set1"))
+
+def kMeansInitCentroids(X, K):
+	"""
+	Initializes K centroids to be used for K-means
+	Initialize the K centroids as K randomly selected points from X
+	"""
+	import random
+	return X[random.sample(np.arange(X.shape[0]), K), :]
