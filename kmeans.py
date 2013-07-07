@@ -90,10 +90,12 @@ def plotProgresskMeans(X, centroids, previous, idx, K, i):
 	Plots line between previous and current location of centroids
 	"""
 	import matplotlib.pyplot as pyplot
+	#plot the points with the new color assignment
 	plotDataPoints(X, idx, K)
-
+	#plot the current centroids
 	pyplot.plot(centroids[:,0], centroids[:, 1], 'x', markeredgecolor='k', markersize=10, linewidth=20)
 	for j in xrange(0, centroids.shape[0]):
+		#plot line from previous centroid to current centroid
 		pyplot.plot(np.hstack([centroids[j, 0], previous[j, 0]]), np.hstack([centroids[j, 1], previous[j, 1]]), c='k')
 	pyplot.title("Iteration number {0}".format(i))
 	pyplot.draw()	
