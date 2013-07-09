@@ -8,7 +8,7 @@ def import_mlab(filename):
 	pdata=dict()
 	for key in data.keys():
 		if key[0]!='_':
-			pdata[key]=data[key].squeeze()
+			pdata[key] = data[key].squeeze()
 	return pdata
 
 def dist_mat(x, centroids):
