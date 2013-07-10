@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as pyplot
 
 def pca(X):
 	"""
@@ -47,14 +48,19 @@ def displayData(X):
 
 	#blank display
 	display_array = np.ones(pad + display_rows * (example_height + pad),
-						pad + display_cols * (example_width + pad))
+					pad + display_cols * (example_width + pad))
 
-	curr_ex = 1
+	curr_ex = 0
 	for j in xrange(0, display_rows):
 		for i in xrange(0, display_cols):
-			if curr_ex > m:
+			if curr_ex >= m:
 				break
 
 			max_val = np.max(math.abs(X[curr_ex, :]))
-			display_array[(pad + j * example_height):(pad + )
-			, pad + i * example_width]	
+			display_array[(pad + j * (example_height + pad)) + np.arange(example_height)
+			, pad + i * (example_width + pad) + np.arange(example_width)] \
+			= np.reshape(X[curr_ex, :], (example_height, example_width))
+
+	pyplot.imshow(display_array)
+	pyplot.draw()	
+	pyplot.show(block=False)		
