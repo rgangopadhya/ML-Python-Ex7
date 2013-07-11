@@ -33,6 +33,7 @@ def displayData(X):
 	Display 2D data stored in X in a nice grid
 	"""
 	import math
+	import matplotlib.cm as cm	
 	example_width = int(round(math.sqrt(X.shape[1])))
 
 	#find number of rows, columns
@@ -54,13 +55,20 @@ def displayData(X):
 		for i in xrange(display_cols):
 			if curr_ex >= m:
 				break
-			xr = pad + j * (example_height + pad) + np.arange(example_height)
-			yr = pad + i * (example_width + pad) + np.arange(example_width)		
-		
-			max_val = math.fabs(np.max(X[curr_ex, :]))
-			display_array[xr, :][:, yr]\
-			= np.reshape(X[curr_ex, :], (example_height, example_width))/max_val
+			x_pos = pad + j * (example_height + pad)	
+			xr_st = x_pos
+			xr_end = x_pos + example_height
+			y_pos = pad + i * (example_width + pad)
+			yr_st = y_pos
+			yr_end = y_pos + example_width
 
-	pyplot.imshow(display_array)
-	pyplot.draw()	
-	pyplot.show()		
+			max_val = math.fabs(np.max(X[curr_ex, :]))
+
+			xreshape = 	np.reshape(X[curr_ex, :], (example_height, example_width), 'F')/max_val
+			display_array[xr_st:xr_end, yr_st:yr_end] = xreshape
+
+			curr_ex += 1	
+
+	pyplot.imshow(display_array, cmap=cm.gray)
+	#pyplot.draw()	
+	#pyplot.show()		
